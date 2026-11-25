@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#081326"><title>SKYFX Metaverse</title>
+<style>
+:root{--gold:#e6bd66;--navy:#081326;--panel:rgba(7,16,32,.9);--line:#e6bd6670}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#081326;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}
+#world{position:fixed;inset:0}canvas{display:block}
+header{position:fixed;z-index:4;top:10px;left:12px;right:12px;display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid var(--line);border-radius:15px;background:var(--panel);backdrop-filter:blur(12px)}
+.brand{font-weight:900;letter-spacing:2px;white-space:nowrap;color:#ffdf9b}.brand b{display:inline-grid;place-items:center;background:linear-gradient(140deg,#ffe9a9,#b57b22);color:#111;border-radius:9px;width:30px;height:30px;margin-right:7px}
+nav{display:flex;gap:4px;overflow:auto;scrollbar-width:none;flex:1}nav button,.action{background:transparent;color:#eee;border:1px solid transparent;border-radius:9px;padding:9px 11px;font-size:12px;white-space:nowrap;cursor:pointer}
+nav button:hover,nav button.active{border-color:var(--line);background:#e6bd6622;color:#ffe3a1}
+button.primary{background:linear-gradient(135deg,#ffe6a0,#c48a2e);color:#17120a;border:0;font-weight:800}
+.panel{position:fixed;z-index:3;background:var(--panel);border:1px solid var(--line);border-radius:15px;backdrop-filter:blur(12px);box-shadow:0 10px 35px #0007}
+.status{left:14px;top:83px;padding:12px 14px;width:225px;font-size:12px}.status strong{color:#ffe2a0}.status p{color:#c2cad7;line-height:1.45;margin:6px 0 0}
+.online{right:14px;top:83px;padding:12px 14px;width:185px;font-size:12px}.online strong{color:#ffe2a0}.online div{margin-top:6px;color:#bfc9d8}
+.chat{right:14px;bottom:15px;width:285px;padding:11px}.chathead{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#ffe2a0;font-weight:800}.messages{height:128px;overflow:auto;margin:9px 0;padding:5px;background:#0003;border-radius:8px;font-size:11px;color:#dce3ef}.msg{margin:0 0 7px;overflow-wrap:anywhere}.msg b{color:#f4cf7e}.chatrow{display:flex;gap:5px}.chatrow input,.nameinput{min-width:0;flex:1;background:#101d31;border:1px solid #ffffff28;border-radius:8px;color:#fff;padding:9px;font-size:12px}.chatrow button{padding:8px 11px}
+.bottom{position:fixed;z-index:3;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:5px;padding:7px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.bottom button{background:transparent;color:#eee;border:0;padding:8px 10px;border-radius:8px;font-size:11px;cursor:pointer}.bottom button:hover{background:#e6bd6622;color:#ffe3a1}
+.tools{position:fixed;right:14px;top:45%;z-index:3;display:grid;gap:7px}.tools button{width:39px;height:39px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:#ffe2a0;font-size:17px;cursor:pointer}
+.hint{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);z-index:2;background:#071326b8;border:1px solid #ffffff24;border-radius:30px;padding:7px 12px;color:#dce4ef;font-size:10px;white-space:nowrap}
+.mobilepad{position:fixed;z-index:4;left:12px;bottom:15px;display:none;grid-template-columns:repeat(3,39px);gap:4px}.mobilepad button{height:38px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:#ffe2a0;font-size:16px}
+.modalbg{position:fixed;inset:0;z-index:9;display:none;place-items:center;background:#020611b8;padding:16px}.modalbg.show{display:grid}.modal{width:min(390px,100%);padding:20px;border:1px solid var(--line);border-radius:17px;background:#0c1b31}.modal h2{margin:0 0 8px;color:#ffe2a0}.modal p{font-size:13px;line-height:1.6;color:#c8d1df}.modal input{width:100%;margin:6px 0 12px}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:10;background:#0b1a30;border:1px solid var(--line);border-radius:20px;padding:9px 14px;font-size:12px;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1}
+@media(max-width:700px){header{top:6px;left:6px;right:6px;padding:6px;gap:5px}.brand{font-size:13px}.brand b{width:27px;height:27px}nav button{font-size:10px;padding:8px}.status{top:66px;left:7px;width:155px;padding:9px;font-size:10px}.online{top:66px;right:7px;width:135px;padding:9px;font-size:10px}.chat{right:7px;bottom:7px;width:220px}.messages{height:85px}.bottom{bottom:7px;left:50%;gap:0}.bottom button{padding:8px 6px;font-size:10px}.hint{bottom:63px;font-size:9px}.tools{right:7px;top:auto;bottom:145px}.tools button{width:34px;height:34px}.mobilepad{display:grid}}
+</style>
+</head>
+<body>
+<div id="world"></div>
+<header><div class="brand"><b>✦</b> SKYFX</div><nav>
+<button class="active" data-zone="plaza">⌂ Plaza</button><button data-zone="lobby">Lobi</button><button data-zone="trading">Trading</button><button data-zone="meeting">Rapat</button><button data-zone="garden">Taman</button>
+</nav><button class="action primary" id="profileBtn">Profil</button></header>
+<section class="panel status"><strong>SKYFX METAVERSE</strong><p id="zoneText">Selamat datang di plaza kantor SKYFX. Jelajahi dunia virtual bersama pengunjung lain.</p><p id="connection">● Menghubungkan server…</p><p>Avatar: <b id="myName">Guest</b></p></section>
+<section class="panel online"><strong>● Pengunjung online</strong><div><b id="onlineCount">1</b> pengguna di dunia ini</div><div id="playerNames">Anda</div></section>
+<section class="panel chat"><div class="chathead"><span>💬 CHAT DUNIA</span><span id="chatState">Menghubungkan</span></div><div class="messages" id="messages"><p class="msg">Selamat datang di SKYFX Metaverse!</p></div><div class="chatrow"><input id="chatInput" maxlength="240" placeholder="Tulis pesan…"><button class="action primary" id="sendChat">Kirim</button></div></section>
+<div class="tools"><button id="fullscreen" title="Layar penuh">⛶</button><button id="resetView" title="Atur kamera">⌂</button></div>
+<div class="bottom"><button data-action="sit">🪑 Duduk (E)</button><button data-action="wave">👋 Sapa (Q)</button><button data-action="run">🏃 Lari (Shift)</button></div>
+<div class="mobilepad"><span></span><button data-key="w">▲</button><span></span><button data-key="a">◀</button><button data-key="s">▼</button><button data-key="d">▶</button></div>
+<div class="hint">WASD / tombol arah: bergerak · Shift: lari · E: duduk/berdiri dekat bangku · Q: melambaikan tangan · Seret: kamera</div>
+<div class="modalbg" id="modal"><div class="modal"><h2>Profil Avatar</h2><p>Nama yang terlihat oleh pengunjung lain.</p><input class="nameinput" id="nameInput" maxlength="20" placeholder="Nama avatar"><button class="action primary" id="saveName">Simpan nama</button> <button class="action" id="closeModal">Tutup</button><p style="font-size:11px">Gunakan nama yang pantas. Chat dan posisi avatar terlihat oleh pengguna lain di server ini.</p></div></div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const $=s=>document.querySelector(s), scene=new THREE.Scene();
+scene.background=new THREE.Color(0x8193aa);scene.fog=new THREE.Fog(0x8193aa,55,120);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,220);camera.position.set(0,23,40);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;$('#world').appendChild(renderer.domElement);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(0,5,0);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI*.49;orbit.minDistance=10;orbit.maxDistance=70;
+scene.add(new THREE.HemisphereLight(0xdbeaff,0x55432f,2));
+const sun=new THREE.DirectionalLight(0xffdfb0,3);sun.position.set(-22,35,22);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-40;sun.shadow.camera.right=40;sun.shadow.camera.top=40;sun.shadow.camera.bottom=-40;scene.add(sun);
+const M={};function mat(k,c,r=.7,m=0,opts={}){return M[k]=new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m,...opts})}
+mat('grass',0x3d603b);mat('pave',0x918779);mat('dark',0x101722,.3,.45);mat('stone',0x171b21,.25,.4);mat('brick',0x655044);mat('glass',0x83b9d5,.15,.3,{transparent:true,opacity:.45});mat('gold',0xd9a94e,.25,.7);mat('wood',0x68482e);mat('leaf',0x2e713f);mat('leaf2',0x478b50);mat('white',0xe4d9c4);mat('glow',0xffd78c,.3,.2,{emissive:0xffbd53,emissiveIntensity:1.5});
+function box(w,h,d,k,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M[k]);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function cyl(r1,r2,h,k,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,32),M[k]);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function text(s,w,h,x,y,z){let c=document.createElement('canvas');c.width=1024;c.height=220;let g=c.getContext('2d');g.font='bold 76px Georgia';g.textAlign='center';g.textBaseline='middle';g.shadowColor='#ffe6a6';g.shadowBlur=20;g.fillStyle='#fff0ce';g.fillText(s,512,110);let t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;let o=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false}));o.position.set(x,y,z);scene.add(o)}
+function point(x,y,z,int=12){let l=new THREE.PointLight(0xffce7c,int,10);l.position.set(x,y,z);scene.add(l)}
+box(75,.4,90,'grass',0,-.35,0);box(38,.25,43,'pave',0,-.04,1);
+for(let x=-18;x<=18;x+=2)box(.025,.01,43,'white',x,.1,1);
+for(let z=-20;z<=22;z+=2)box(38,.01,.025,'white',0,.1,z);
+// Headquarters mass and glass floors
+box(38,19,6,'brick',0,9.5,-19);box(40,.7,6.5,'dark',0,19.2,-19);
+for(let f=0;f<3;f++){let y=4+f*5.1;box(37,4.4,.18,'dark',0,y,-15.85);box(36.4,4.1,.08,'glass',0,y,-15.72);for(let x=-18;x<=18;x+=3.6)box(.15,4.4,.18,'gold',x,y,-15.6)}
+box(25,3.5,.55,'stone',0,18.4,-15.5);text('SKYFX',15,2.5,0,18.4,-15.2);
+box(27,4.6,1.1,'stone',0,3.1,-15);text('KANTOR SKYFX',12,1.2,0,3.6,-14.4);text('PT SKYFX GLOBAL',5,.35,0,2.8,-14.4);
+box(28,.3,8,'white',0,.7,-10);
+box(8,1.1,1.2,'stone',0,1.45,-11);box(7.5,.1,1.1,'gold',0,2.05,-11);
+for(let x of [-12,-7,7,12]){cyl(.3,.4,.5,'stone',x,.35,-8);for(let i=0;i<6;i++){let a=i*Math.PI/3;let leaf=new THREE.Mesh(new THREE.ConeGeometry(.15,1.8,5),M.leaf2);leaf.position.set(x+Math.cos(a)*.5,1.3,-8+Math.sin(a)*.5);leaf.rotation.z=Math.cos(a)*.6;scene.add(leaf)}}
+function palm(x,z,s=1){cyl(.18*s,.28*s,5.8*s,'wood',x,2.9*s,z);for(let i=0;i<9;i++){let a=i*Math.PI*2/9,l=new THREE.Mesh(new THREE.ConeGeometry(.28*s,4*s,5),M.leaf);l.position.set(x+Math.cos(a)*1.4*s,5.4*s,z+Math.sin(a)*1.4*s);l.rotation.z=Math.cos(a)*.9;l.rotation.x=Math.sin(a)*.9;scene.add(l)}}
+for(let p of [[-22,-10],[22,-10],[-23,2],[23,2],[-21,16],[21,16],[-17,28],[17,28]])palm(...p,1);
+for(let x of [-14,14])for(let z of [-8,0,9,18,26]){cyl(.1,.15,2.2,'dark',x,1.1,z);box(.75,.15,.6,'gold',x,2.25,z);point(x,2.4,z,2)}
+// fountain
+cyl(6,6,.6,'stone',0,.45,3);cyl(5.5,5.5,.1,'gold',0,.8,3);cyl(4.9,4.9,.12,'dark',0,.9,3);
+const water=new THREE.Mesh(new THREE.CylinderGeometry(4.7,4.7,.06,64),new THREE.MeshStandardMaterial({color:0x4d9ca8,metalness:.6,roughness:.12,transparent:true,opacity:.78}));water.position.set(0,1,3);scene.add(water);
+cyl(1.5,2,.45,'white',0,1.25,3);cyl(.5,.7,1,'gold',0,1.9,3);
+const jets=[];for(let i=0;i<8;i++){let a=i*Math.PI/4,j=new THREE.Mesh(new THREE.CylinderGeometry(.025,.05,1.3,8),new THREE.MeshBasicMaterial({color:0xa8efff,transparent:true,opacity:.65}));j.position.set(Math.cos(a)*1.35,2.25,3+Math.sin(a)*1.35);j.rotation.z=-Math.cos(a)*.3;j.rotation.x=Math.sin(a)*.3;scene.add(j);jets.push(j)}
+// benches
+for(let x of [-10,10])for(let z of [11,21]){box(3,.18,.75,'wood',x,.6,z);for(let dx of [-1.2,1.2])box(.14,.65,.65,'dark',x+dx,.32,z)}
+// side room shells / interior furniture
+for(let [x,title] of [[-16,'TRADING ROOM'],[16,'MEETING ROOM']]){box(9,5,10,'dark',x,2.7,-3);box(8.5,4.6,.1,'glass',x,2.7,2.1);text(title,5,.6,x,4.7,2.2);for(let dx of [-2,0,2]){box(1.6,.15,.9,'wood',x+dx,1.4,-3);box(.1,1,.1,'gold',x+dx,1.9,-3)}}
+
+// Character rig made from meshes: suit, head, limbs, hands, shoes.
+function makeAvatar(color=0x24364d,name='Guest'){
+ const root=new THREE.Group(),rig=new THREE.Group();root.add(rig);
+ const skin=new THREE.MeshStandardMaterial({color:0xb98160,roughness:.8}),suitmat=new THREE.MeshStandardMaterial({color,roughness:.55}),shirt=new THREE.MeshStandardMaterial({color:0xece8df});
+ function part(geo,mat,x,y,z){let o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=true;rig.add(o);return o}
+ part(new THREE.CapsuleGeometry(.34,.7,5,10),suitmat,0,1.25,0);
+ part(new THREE.SphereGeometry(.24,16,12),skin,0,2.05,0);
+ part(new THREE.SphereGeometry(.245,16,8,0,Math.PI*2,0,Math.PI*.55),new THREE.MeshStandardMaterial({color:0x2b211c}),0,2.16,0);
+ part(new THREE.BoxGeometry(.09,.5,.035),M.gold,0,1.42,.33);
+ const arms=[],legs=[];
+ for(let side of [-1,1]){let a=part(new THREE.CapsuleGeometry(.105,.62,4,8),suitmat,side*.43,1.35,0);a.rotation.z=side*.12;arms.push(a);
+ let h=part(new THREE.SphereGeometry(.11,10,8),skin,side*.44,.91,.02);
+ let l=part(new THREE.CapsuleGeometry(.12,.58,4,8),suitmat,side*.16,.43,0);legs.push(l);
+ part(new THREE.BoxGeometry(.27,.12,.42),M.dark||M.stone,side*.16,.09,.08)}
+ return {root,rig,arms,legs,name,phase:Math.random()*6,sit:false,waveUntil:0};
+}
+const my=makeAvatar(0x1d3857,'Guest');scene.add(my.root);my.root.position.set(0,0,10);
+const remotes=new Map();let socket=null,clientId=null,connected=false,lastSend=0,lastChat=0;
+let myName='Guest'+Math.floor(100+Math.random()*900);$('#myName').textContent=myName;
+function setName(n){myName=(n||'Guest').trim().slice(0,20)||'Guest';my.name=myName;$('#myName').textContent=myName;send({type:'name',name:myName})}
+function wsUrl(){return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws'}
+function connect(){if(location.protocol==='file:'){connection('Buka melalui server Node.js, bukan file langsung');return}
+ try{socket=new WebSocket(wsUrl())}catch(e){connection('Server belum tersedia');return}
+ socket.onopen=()=>{connected=true;connection('● Terhubung ke server multiplayer');$('#chatState').textContent='Online';send({type:'join',name:myName});toast('Terhubung ke dunia SKYFX')};
+ socket.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch{return}handle(m)};
+ socket.onclose=()=>{connected=false;connection('○ Terputus — mencoba sambung ulang');$('#chatState').textContent='Offline';setTimeout(connect,2500)};
+ socket.onerror=()=>connection('Server tidak dapat dijangkau');
+}
+function connection(s){$('#connection').textContent=s}
+function send(o){if(socket&&socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify(o))}
+function handle(m){
+ if(m.type==='welcome'){clientId=m.id;(m.players||[]).forEach(p=>addRemote(p));updateOnline()}
+ if(m.type==='joined'){addRemote(m.player);chatLine('SYSTEM',m.player.name+' bergabung')}
+ if(m.type==='left'){removeRemote(m.id);chatLine('SYSTEM',(m.name||'Pengunjung')+' keluar')}
+ if(m.type==='state'&&m.id!==clientId){let r=remotes.get(m.id);if(r){r.target.position.set(m.x,m.y,m.z);r.target.rotation.y=m.rot||0;r.state=m.state||'idle';r.name=m.name||r.name}}
+ if(m.type==='chat')chatLine(m.name,m.text);
+ if(m.type==='count'){ $('#onlineCount').textContent=m.count;$('#playerNames').textContent=m.names?.slice(0,3).join(', ')||'Anda'}
+ if(m.type==='error')toast(m.message||'Terjadi kesalahan');
+}
+function addRemote(p){if(!p||p.id===clientId||remotes.has(p.id))return;let av=makeAvatar(p.color||0x35435c,p.name||'Guest');scene.add(av.root);av.root.position.set(p.x||0,0,p.z||0);remotes.set(p.id,{avatar:av,target:new THREE.Vector3(p.x||0,0,p.z||0),rot:p.rot||0,state:'idle',name:p.name||'Guest'});updateOnline()}
+function removeRemote(id){let r=remotes.get(id);if(r){scene.remove(r.avatar.root);remotes.delete(id)}updateOnline()}
+function updateOnline(){$('#onlineCount').textContent=remotes.size+1;$('#playerNames').textContent=[myName,...[...remotes.values()].slice(0,2).map(r=>r.name)].join(', ')}
+function chatLine(name,msg){let p=document.createElement('p');p.className='msg';let b=document.createElement('b');b.textContent=name+': ';p.append(b,document.createTextNode(msg));$('#messages').append(p);$('#messages').scrollTop=$('#messages').scrollHeight;while($('#messages').children.length>45)$('#messages').firstChild.remove()}
+function sendChat(){let text=$('#chatInput').value.trim();if(!text)return;if(!connected){toast('Hubungkan ke server untuk chat multiplayer');return}if(Date.now()-lastChat<700){toast('Tunggu sebentar sebelum mengirim pesan');return}lastChat=Date.now();send({type:'chat',text});$('#chatInput').value=''}
+$('#sendChat').onclick=sendChat;$('#chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
+function toast(s){let el=$('#toast');el.textContent=s;el.classList.add('show');clearTimeout(el.timer);el.timer=setTimeout(()=>el.classList.remove('show'),2200)}
+$('#profileBtn').onclick=()=>{$('#nameInput').value=myName;$('#modal').classList.add('show')};$('#closeModal').onclick=()=>$('#modal').classList.remove('show');$('#saveName').onclick=()=>{setName($('#nameInput').value);$('#modal').classList.remove('show')};
+$('#fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.();
+$('#resetView').onclick=()=>{camera.position.set(0,23,40);orbit.target.set(0,5,0)};
+const zones={plaza:{cam:[0,23,40],target:[0,5,0],pos:[0,0,10],label:'Plaza utama: air mancur, taman, dan akses ke seluruh gedung.'},lobby:{cam:[0,11,13],target:[0,2,-8],pos:[0,0,-5],label:'Lobi dan meja resepsionis SKYFX.'},trading:{cam:[-18,9,9],target:[-16,2,-3],pos:[-16,0,5],label:'Trading Room: area kerja dan diskusi pasar.'},meeting:{cam:[18,9,9],target:[16,2,-3],pos:[16,0,5],label:'Meeting Room: ruang rapat dan presentasi.'},garden:{cam:[0,19,35],target:[0,2,18],pos:[0,0,19],label:'Taman terbuka dan area air mancur.'}};
+document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>{let z=zones[b.dataset.zone];camera.position.set(...z.cam);orbit.target.set(...z.target);my.root.position.set(...z.pos);$('#zoneText').textContent=z.label;document.querySelectorAll('[data-zone]').forEach(x=>x.classList.toggle('active',x===b))});
+const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();if(e.key.toLowerCase()==='e')toggleSit();if(e.key.toLowerCase()==='q')wave()});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.querySelectorAll('[data-key]').forEach(b=>{let k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});
+let walkPhase=0,run=false;
+function nearestBench(){let best=null,dist=Infinity;for(let x of [-10,10])for(let z of [11,21]){let d=Math.hypot(my.root.position.x-x,my.root.position.z-z);if(d<dist){dist=d;best={x,z}}}return dist<2.5?best:null}
+function toggleSit(){if(my.sit){my.sit=false;my.rig.rotation.x=0;my.legs.forEach((l,i)=>l.rotation.x=0);toast('Avatar berdiri');return}let b=nearestBench();if(!b){toast('Dekati bangku taman untuk duduk');return}my.sit=true;my.root.position.set(b.x,0,b.z);my.root.rotation.y=Math.PI;my.rig.rotation.x=-.08;my.legs.forEach((l,i)=>{l.rotation.x=-1.15;l.position.y=.72;l.position.z=.18});toast('Avatar duduk')}
+function wave(){my.waveUntil=performance.now()+1200;toast('Avatar menyapa pengunjung')}
+document.querySelector('[data-action=sit]').onclick=toggleSit;document.querySelector('[data-action=wave]').onclick=wave;document.querySelector('[data-action=run]').onclick=()=>{run=!run;toast(run?'Mode lari aktif':'Mode berjalan aktif')};
+let lastFrame=performance.now();
+function animate(now){requestAnimationFrame(animate);let dt=Math.min((now-lastFrame)/1000,.04);lastFrame=now;let dx=0,dz=0;
+ if(!my.sit){if(keys.w||keys.arrowup)dz-=1;if(keys.s||keys.arrowdown)dz+=1;if(keys.a||keys.arrowleft)dx-=1;if(keys.d||keys.arrowright)dx+=1}
+ let moving=dx!==0||dz!==0;let sprint=keys.shift||run;let speed=sprint?7:3.6;
+ if(moving){let len=Math.hypot(dx,dz);dx/=len;dz/=len;my.root.position.x+=dx*speed*dt;my.root.position.z+=dz*speed*dt;my.root.position.x=THREE.MathUtils.clamp(my.root.position.x,-29,29);my.root.position.z=THREE.MathUtils.clamp(my.root.position.z,-25,36);my.root.rotation.y=Math.atan2(dx,dz);walkPhase+=dt*(sprint?13:8);my.legs.forEach((l,i)=>{l.rotation.x=Math.sin(walkPhase+i*Math.PI)*.65;l.position.y=.43});my.arms.forEach((a,i)=>a.rotation.x=Math.sin(walkPhase+i*Math.PI)*.45)}
+ else if(!my.sit){my.legs.forEach(l=>l.rotation.x=0);my.arms.forEach(a=>a.rotation.x=0)}
+ if(now<my.waveUntil)my.arms[1].rotation.x=-2.2+Math.sin(now*.02)*.4;
+ if(now-lastSend>50){lastSend=now;send({type:'state',x:my.root.position.x,y:0,z:my.root.position.z,rot:my.root.rotation.y,state:my.sit?'sit':moving?(sprint?'run':'walk'):'idle',name:myName})}
+ for(let r of remotes.values()){let av=r.avatar;av.root.position.lerp(r.target,Math.min(1,dt*9));av.root.rotation.y=r.rot;let phase=now*.008;if(r.state==='walk'||r.state==='run'){av.legs.forEach((l,i)=>l.rotation.x=Math.sin(phase+i*Math.PI)*.55);av.arms.forEach((a,i)=>a.rotation.x=Math.sin(phase+i*Math.PI)*.35)}else if(r.state==='sit'){av.legs.forEach(l=>l.rotation.x=-1.1)}else{av.legs.forEach(l=>l.rotation.x=0);av.arms.forEach(a=>a.rotation.x=0)}}
+ jets.forEach((j,i)=>j.scale.y=.8+Math.sin(now*.004+i)*.18);orbit.update();renderer.render(scene,camera)}
+requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+connect();
+</script>
+</body></html>
